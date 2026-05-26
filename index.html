@@ -147,6 +147,31 @@
         function formatSignTight(num) {
             return num >= 0 ? `+${num}` : `-${Math.abs(num)}`;
         }
+        
+        function formatFactor(num) {
+            return num < 0 ? `(${num})` : num;
+        }
+
+        // Smart formatting for polynomials so we don't get "1x^2" or "+ -5x"
+        function formatTerm(coeff, variable, isLeading = false) {
+            if (coeff === 0) return "";
+            let sign = coeff > 0 ? (isLeading ? "" : "+ ") : (isLeading ? "-" : "- ");
+            let absCoeff = Math.abs(coeff);
+            let coeffStr = (absCoeff === 1 && variable !== "") ? "" : absCoeff;
+            return `${sign}${coeffStr}${variable}`;
+        }
+
+        function formatPolynomial(terms) {
+            let str = "";
+            for(let i=0; i<terms.length; i++) {
+                let c = terms[i].c;
+                let v = terms[i].v;
+                if (c === 0) continue;
+                let isLeading = (str === "");
+                str += formatTerm(c, v, isLeading) + " ";
+            }
+            return str.trim();
+        }
 
         // Generator functions for Variant A (Based on Variant 1 structure)
         function generateVariantAData(index) {
@@ -184,15 +209,26 @@
             while(tx1 === tx2) { tx2 = getRandomInt(-2, 4); }
             let tb = -t_a * (tx1 + tx2);
             let tc = t_a * tx1 * tx2;
+            let t2_eq_str = formatPolynomial([{c: t_a, v: 'x^2'}, {c: tb, v: 'x'}, {c: tc, v: ''}]);
 
             // Task 3: Given Equation A x^2 + B x + C = 0
-            let x_1 = getRandomInt(1, 4);
-            let x_2 = getRandomInt(x_1 + 1, 5);
-            let t3_A = getRandomInt(2, 5);
-            let t3_B = -t3_A * (x_1 + x_2);
-            let t3_C = t3_A * x_1 * x_2;
+            // We use Vieta backward so the calculation for P is clean.
+            // S = x1 + x2, Pv = x1 * x2
+            let S = getRandomInt(3, 8); // Positive roots -> Sum > 0
+            let Pv = getRandomInt(1, 6); // Positive roots -> Product > 0
+            let Dv = S*S - 4*Pv;
+            // Force Discriminant > 0 and NOT a perfect square
+            while(Dv <= 0 || Number.isInteger(Math.sqrt(Dv))) {
+                S = getRandomInt(3, 8);
+                Pv = getRandomInt(1, 6);
+                Dv = S*S - 4*Pv;
+            }
+            let t3_A = getRandomInt(1, 3);
+            let t3_B = -t3_A * S;
+            let t3_C = t3_A * Pv;
             let k = getRandomInt(1, 3);
-            let p_val = (x_1*x_1 + x_2*x_2) - k*(x_1 + x_2);
+            let p_val = (S*S - 2*Pv) - k*S;
+            let t3_eq_str = formatPolynomial([{c: t3_A, v: 'x^2'}, {c: t3_B, v: 'x'}, {c: t3_C, v: ''}]);
 
             // Task 4: x^2 + px + q_val = 0. One root is r_given.
             let r_given = getRandomInt(3, 7);
@@ -243,8 +279,8 @@
                 t1a: { a, b, c, ans: `${b}; ${x2}` },
                 t1b: { Sb, Pb, ans: `\\pm ${r1}; \\pm ${r2}` },
                 t1c: { d, e, f, ans: `${r_a}; ${r_b}; ${r_c}; ${r_d}` },
-                t2: { a: t_a, b: tb, c: tc, ans: `${t_a > 0 ? t_a : ''}(x ${formatSignTight(-tx1)})(x ${formatSignTight(-tx2)})` },
-                t3: { A: t3_A, B: t3_B, C: t3_C, k, ans_signs: "двата корена са положителни", ans_p: p_val },
+                t2: { eq_str: t2_eq_str, ans: `${t_a > 0 ? t_a : ''}(x ${formatSignTight(-tx1)})(x ${formatSignTight(-tx2)})` },
+                t3: { A: t3_A, B: t3_B, C: t3_C, eq_str: t3_eq_str, k, ans_signs: "двата корена са положителни", ans_p: p_val },
                 t4: { r_given, r_other, p_coef, q_val },
                 t5: { d1, ac_len },
                 t6: { bmc_deg, bdc_deg, abd_deg, aqd_deg },
@@ -288,14 +324,26 @@
             while(tx1 === tx2) { tx2 = getRandomInt(-2, 4); }
             let tb = -t_a * (tx1 + tx2);
             let tc = t_a * tx1 * tx2;
+            let t2_eq_str = formatPolynomial([{c: t_a, v: 'x^2'}, {c: tb, v: 'x'}, {c: tc, v: ''}]);
 
             // Task 3: Given Equation A x^2 + B x + C = 0
-            let x_1 = getRandomInt(-3, -1);
-            let x_2 = getRandomInt(1, 4);
-            let t3_A = -getRandomInt(2, 4);
-            let t3_B = -t3_A * (x_1 + x_2);
-            let t3_C = t3_A * x_1 * x_2;
-            let p_val = 4*x_1*x_2 - 3*x_1 - 3*x_2;
+            // We use Vieta backward to ensure P is a clean integer
+            let S = getRandomInt(-4, 4); 
+            if (S === 0) S = 1;
+            let Pv = getRandomInt(-6, -1); // Negative product -> Roots with different signs
+            let Dv = S*S - 4*Pv;
+            // Force Discriminant > 0 and NOT a perfect square
+            while(Dv <= 0 || Number.isInteger(Math.sqrt(Dv))) {
+                S = getRandomInt(-4, 4);
+                if (S === 0) S = 1;
+                Pv = getRandomInt(-6, -1);
+                Dv = S*S - 4*Pv;
+            }
+            let t3_A = getRandomInt(-3, -1); // Make A negative
+            let t3_B = -t3_A * S;
+            let t3_C = t3_A * Pv;
+            let p_val = 4*Pv - 3*S;
+            let t3_eq_str = formatPolynomial([{c: t3_A, v: 'x^2'}, {c: t3_B, v: 'x'}, {c: t3_C, v: ''}]);
 
             // Task 4: x^2 + px + q = 0. One root is r_given.
             let r_given = getRandomInt(-5, -1);
@@ -336,8 +384,8 @@
                 t1a: { a, b, c, d, ans: `${r1}; ${r2}` },
                 t1b: { Sb, Pb, ans: `\\pm ${br1}; \\pm ${br2}` },
                 t1c: { d_c, e, f, ans: `${r_a}; ${r_b}; ${r_c}; ${r_d}` },
-                t2: { a: t_a, b: tb, c: tc, ans: `${t_a}(x ${formatSignTight(-tx1)})(x ${formatSignTight(-tx2)})` },
-                t3: { A: t3_A, B: t3_B, C: t3_C, ans_signs: "двата корена са с различни знаци", ans_p: p_val },
+                t2: { eq_str: t2_eq_str, ans: `${t_a}(x ${formatSignTight(-tx1)})(x ${formatSignTight(-tx2)})` },
+                t3: { A: t3_A, B: t3_B, C: t3_C, eq_str: t3_eq_str, ans_signs: "корените са с различни знаци", ans_p: p_val },
                 t4: { r_given, r_other, p_coef, q_val },
                 t5: { mq_len, dist },
                 t6: { boc_deg, bqc_deg, bac_deg, amd_deg },
@@ -539,7 +587,7 @@
                             <div class="task-item">
                                 <h4 class="font-bold text-slate-900 mb-2">
                                     2. (4 т.) Да се разложи многочленът на множители: 
-                                    <span class="math-expr">\\(M = ${v.t2.a}x^2 ${formatSign(v.t2.b)}x ${formatSign(v.t2.c)}\\)</span>
+                                    <span class="math-expr">\\(M = ${v.t2.eq_str}\\)</span>
                                 </h4>
                             </div>
 
@@ -547,7 +595,7 @@
                             <div class="task-item">
                                 <h4 class="font-bold text-slate-900 mb-1">
                                     3. Дадено е уравнението: 
-                                    <span class="math-expr">\\(${v.t3.A}x^2 ${formatSign(v.t3.B)}x ${formatSign(v.t3.C)} = 0\\)</span>
+                                    <span class="math-expr">\\(${v.t3.eq_str} = 0\\)</span>
                                 </h4>
                                 <div class="pl-4 space-y-1">
                                     <p>а) (3 т.) Да се покаже, че уравнението има два реални корена и да се определят знаците им.</p>
@@ -560,7 +608,7 @@
                             <!-- Task 4 -->
                             <div class="task-item">
                                 <h4 class="font-bold text-slate-900 mb-1">
-                                    4. (4 т.) Единият от корените на уравнението <span class="math-expr">\\(x^2 ${formatSign(v.t4.p_coef)}x ${formatSign(v.t4.q_val)} = 0\\)</span> е равен на <span class="math-expr">\\(${v.t4.r_given}\\)</span>. 
+                                    4. (4 т.) Единият от корените на уравнението <span class="math-expr">\\(x^2 + px ${formatSign(v.t4.q_val)} = 0\\)</span> е равен на <span class="math-expr">\\(${v.t4.r_given}\\)</span>. 
                                     Да се намери другият корен на уравнението и коефициентът <span class="math-expr">\\(p\\)</span>.
                                 </h4>
                             </div>
@@ -615,7 +663,7 @@
                             </h5>
                             <p><strong>Зад. 1:</strong> а) <span class="math-expr">\\(x \\in \\{ ${v.t1a.ans} \\}\\)</span>; б) <span class="math-expr">\\(x = ${v.t1b.ans}\\)</span>; в) <span class="math-expr">\\(x \\in \\{ ${v.t1c.ans} \\}\\)</p>
                             <p><strong>Зад. 2:</strong> Разлагане: <span class="math-expr">\\(${v.t2.ans}\\)</span></p>
-                            <p><strong>Зад. 3:</strong> а) <span class="math-expr">\\(D = (${v.t3.B})^2 - 4 \\cdot ${v.t3.A} \\cdot ${v.t3.C} = ${v.t3.B*v.t3.B - 4*v.t3.A*v.t3.C} > 0\\)</span>, ${v.t3.ans_signs}; б) <span class="math-expr">\\(P = ${v.t3.ans_p}\\)</span></p>
+                            <p><strong>Зад. 3:</strong> а) <span class="math-expr">\\(D = ${formatFactor(v.t3.B)}^2 - 4 \\cdot ${formatFactor(v.t3.A)} \\cdot ${formatFactor(v.t3.C)} = ${v.t3.B*v.t3.B - 4*v.t3.A*v.t3.C} > 0\\)</span>, ${v.t3.ans_signs}; б) <span class="math-expr">\\(P = ${v.t3.ans_p}\\)</span></p>
                             <p><strong>Зад. 4:</strong> Другият корен е <span class="math-expr">\\(x_2 = ${v.t4.r_other}\\)</span>; коефициентът <span class="math-expr">\\(p = ${v.t4.p_coef}\\)</span></p>
                             <p><strong>Зад. 5:</strong> Дължина <span class="math-expr">\\(AC = 2 \\cdot ${v.t5.d1} = ${v.t5.ac_len}\\)</span> cm</p>
                             <p><strong>Зад. 6:</strong> <span class="math-expr">\\(\\sphericalangle ABD = ${v.t6.abd_deg}^\\circ\\)</span>, <span class="math-expr">\\(\\sphericalangle AQD = ${v.t6.aqd_deg}^\\circ\\)</span></p>
@@ -662,7 +710,7 @@
                             <div class="task-item">
                                 <h4 class="font-bold text-slate-900 mb-2">
                                     2. (4 т.) Да се разложи многочленът на множители: 
-                                    <span class="math-expr">\\(M = ${v.t2.a}x^2 ${formatSign(v.t2.b)}x ${formatSign(v.t2.c)}\\)</span>
+                                    <span class="math-expr">\\(M = ${v.t2.eq_str}\\)</span>
                                 </h4>
                             </div>
 
@@ -670,7 +718,7 @@
                             <div class="task-item">
                                 <h4 class="font-bold text-slate-900 mb-1">
                                     3. Дадено е уравнението: 
-                                    <span class="math-expr">\\(${v.t3.A}x^2 ${formatSign(v.t3.B)}x ${formatSign(v.t3.C)} = 0\\)</span>
+                                    <span class="math-expr">\\(${v.t3.eq_str} = 0\\)</span>
                                 </h4>
                                 <div class="pl-4 space-y-1">
                                     <p>а) (3 т.) Да се покаже, че уравнението има два реални корена и да се определят знаците им.</p>
@@ -683,7 +731,7 @@
                             <!-- Task 4 -->
                             <div class="task-item">
                                 <h4 class="font-bold text-slate-900 mb-1">
-                                    4. (4 т.) Единият от корените на уравнението <span class="math-expr">\\(x^2 ${formatSign(v.t4.p_coef)}x ${formatSign(v.t4.q_val)} = 0\\)</span> е равен на <span class="math-expr">\\(${v.t4.r_given}\\)</span>. 
+                                    4. (4 т.) Единият от корените на уравнението <span class="math-expr">\\(x^2 ${formatSign(v.t4.p_coef)}x + q = 0\\)</span> е равен на <span class="math-expr">\\(${v.t4.r_given}\\)</span>. 
                                     Да се намери другият корен на уравнението и коефициентът <span class="math-expr">\\(q\\)</span>.
                                 </h4>
                             </div>
@@ -739,7 +787,7 @@
                             </h5>
                             <p><strong>Зад. 1:</strong> а) <span class="math-expr">\\(x \\in \\{ ${v.t1a.ans} \\}\\)</span>; б) <span class="math-expr">\\(x = ${v.t1b.ans}\\)</span>; в) <span class="math-expr">\\(x \\in \\{ ${v.t1c.ans} \\}\\)</p>
                             <p><strong>Зад. 2:</strong> Разлагане: <span class="math-expr">\\(${v.t2.ans}\\)</span></p>
-                            <p><strong>Зад. 3:</strong> а) <span class="math-expr">\\(D = (${v.t3.B})^2 - 4 \\cdot (${v.t3.A}) \\cdot ${v.t3.C} = ${v.t3.B*v.t3.B - 4*v.t3.A*v.t3.C} > 0\\)</span>, ${v.t3.ans_signs}; б) <span class="math-expr">\\(P = ${v.t3.ans_p}\\)</span></p>
+                            <p><strong>Зад. 3:</strong> а) <span class="math-expr">\\(D = ${formatFactor(v.t3.B)}^2 - 4 \\cdot ${formatFactor(v.t3.A)} \\cdot ${formatFactor(v.t3.C)} = ${v.t3.B*v.t3.B - 4*v.t3.A*v.t3.C} > 0\\)</span>, ${v.t3.ans_signs}; б) <span class="math-expr">\\(P = ${v.t3.ans_p}\\)</span></p>
                             <p><strong>Зад. 4:</strong> Другият корен е <span class="math-expr">\\(x_2 = ${v.t4.r_other}\\)</span>; коефициентът <span class="math-expr">\\(q = ${v.t4.q_val}\\)</span></p>
                             <p><strong>Зад. 5:</strong> Разстояние <span class="math-expr">\\(OH = MQ/2 = ${v.t5.dist}\\)</span> cm</p>
                             <p><strong>Зад. 6:</strong> <span class="math-expr">\\(\\sphericalangle BAC = ${v.t6.bac_deg}^\\circ\\)</span>, <span class="math-expr">\\(\\sphericalangle AMD = ${v.t6.amd_deg}^\\circ\\)</span></p>
