@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Генератор на класни работи - ЧЕГ „Проф. Иван Апостолов“</title>
+    <title>Генератор на класни работи - ЧЕГ „Проф. Иван Апостолов"</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- KaTeX for beautiful math formulas -->
@@ -85,7 +85,7 @@
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Училище</label>
-                <input type="text" id="schoolName" value="ЧЕГ „Проф. Иван Апостолов“" oninput="updateMetadata()" class="w-full bg-slate-50 border border-slate-200 rounded px-3 py-1.5 text-sm font-semibold focus:outline-none focus:border-indigo-500">
+                <input type="text" id="schoolName" value="ЧЕГ „Проф. Иван Апостолов"" oninput="updateMetadata()" class="w-full bg-slate-50 border border-slate-200 rounded px-3 py-1.5 text-sm font-semibold focus:outline-none focus:border-indigo-500">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Учебна Година</label>
@@ -124,7 +124,7 @@
 
     <!-- Footer -->
     <footer class="bg-slate-100 border-t border-slate-200 py-6 text-center text-xs text-slate-500 no-print mt-12">
-        <p>© 2026 Интерактивен генератор по Математика за ЧЕГ „Проф. Иван Апостолов“.</p>
+        <p>© 2026 Интерактивен генератор по Математика за ЧЕГ „Проф. Иван Апостолов".</p>
     </footer>
 
     <!-- Script Section -->
@@ -142,6 +142,12 @@
 
         function formatSign(num) {
             return num >= 0 ? `+ ${num}` : `- ${Math.abs(num)}`;
+        }
+
+        // За свободни членове: ако е 0, не се изписва никакъв низ (нито знак, нито нула)
+        function formatSignOrEmpty(num) {
+            if (num === 0) return "";
+            return num > 0 ? `+ ${num}` : `- ${Math.abs(num)}`;
         }
 
         function formatSignTight(num) {
@@ -495,52 +501,97 @@
                     <text x="195" y="205" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b">Q</text>
                 </svg>`;
 
+            // Геометрично коректна диаграма за тип A:
+            // Подредба около окръжността (обратно на часовниковата): A, B, C, D
+            // Дъги: AB=75°, BC=57°, CD=83°, DA=145° (DA е най-голяма ← важно за условията)
+            // Координати: A(154,181) B(249,203) C(294,141) D(236,53)
+            // Q(245,155) вътре, M(350,225) извън (продължение на правите AB и CD)
             const svgTask6TypeA = `
-                <svg width="240" height="240" viewBox="0 0 300 250" class="border border-slate-200 rounded-lg bg-slate-50">
-                    <circle cx="215" cy="130" r="90" fill="none" stroke="#334155" stroke-width="2"/>
-                    <circle cx="215" cy="130" r="3.5" fill="#64748b" />
-                    <text x="225" y="135" font-family="sans-serif" font-size="18" font-weight="bold" fill="#64748b">O</text>
-                    <line x1="15" y1="130" x2="280" y2="214.3" stroke="#94a3b8" stroke-width="1.5" />
-                    <line x1="15" y1="130" x2="280" y2="45.7" stroke="#94a3b8" stroke-width="1.5" />
-                    <line x1="133.2" y1="167.6" x2="260" y2="52.1" stroke="#1e293b" stroke-width="2" />
-                    <line x1="260" y1="207.9" x2="133.2" y2="92.4" stroke="#1e293b" stroke-width="2" />
-                    <circle cx="174.4" cy="130" r="4.5" fill="#ef4444" />
-                    <text x="169" y="152" font-family="sans-serif" font-size="18" font-weight="bold" fill="#ef4444">Q</text>
-                    <circle cx="15" cy="130" r="4" fill="#1e293b" />
-                    <text x="15" y="120" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b">M</text>
-                    <circle cx="133.2" cy="167.6" r="4" fill="#1e293b" />
-                    <text x="123" y="187" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b">A</text>
-                    <circle cx="260" cy="207.9" r="4" fill="#1e293b" />
-                    <text x="270" y="220" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b">B</text>
-                    <circle cx="260" cy="52.1" r="4" fill="#1e293b" />
-                    <text x="270" y="45" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b">C</text>
-                    <circle cx="133.2" cy="92.4" r="4" fill="#1e293b" />
-                    <text x="123" y="85" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b">D</text>
+                <svg width="260" height="220" viewBox="0 0 400 260" class="border border-slate-200 rounded-lg bg-slate-50">
+                    <!-- окръжност -->
+                    <circle cx="215" cy="130" r="80" fill="none" stroke="#334155" stroke-width="2"/>
+                    <!-- център O -->
+                    <circle cx="215" cy="130" r="3" fill="#64748b" />
+                    <text x="200" y="125" font-family="sans-serif" font-size="15" font-weight="bold" fill="#64748b">O</text>
+
+                    <!-- права AB (продължена до M) -->
+                    <line x1="154" y1="181" x2="350" y2="225" stroke="#94a3b8" stroke-width="1.3" />
+                    <!-- права CD (продължена до M) -->
+                    <line x1="350" y1="225" x2="236" y2="53" stroke="#94a3b8" stroke-width="1.3" />
+
+                    <!-- хорда AC -->
+                    <line x1="154" y1="181" x2="294" y2="141" stroke="#1e293b" stroke-width="1.8" />
+                    <!-- хорда BD -->
+                    <line x1="249" y1="203" x2="236" y2="53" stroke="#1e293b" stroke-width="1.8" />
+
+                    <!-- точка Q (вътре в окръжността) -->
+                    <circle cx="245" cy="155" r="4" fill="#ef4444" />
+                    <text x="248" y="170" font-family="sans-serif" font-size="15" font-weight="bold" fill="#ef4444">Q</text>
+
+                    <!-- точка M (извън окръжността, продължение) -->
+                    <circle cx="350" cy="225" r="4" fill="#1e293b" />
+                    <text x="357" y="232" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">M</text>
+
+                    <!-- точките по окръжността -->
+                    <circle cx="154" cy="181" r="3.5" fill="#1e293b" />
+                    <text x="135" y="190" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">A</text>
+
+                    <circle cx="249" cy="203" r="3.5" fill="#1e293b" />
+                    <text x="245" y="222" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">B</text>
+
+                    <circle cx="294" cy="141" r="3.5" fill="#1e293b" />
+                    <text x="302" y="146" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">C</text>
+
+                    <circle cx="236" cy="53" r="3.5" fill="#1e293b" />
+                    <text x="240" y="45" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">D</text>
                 </svg>`;
 
+            // Геометрично коректна диаграма за тип B
+            // Същата конфигурация като тип A, но с показани радиуси OB и OC
+            // (за визуализация на централния ъгъл BOC)
             const svgTask6TypeB = `
-                <svg width="240" height="240" viewBox="0 0 300 250" class="border border-slate-200 rounded-lg bg-slate-50">
-                    <circle cx="215" cy="130" r="90" fill="none" stroke="#334155" stroke-width="2"/>
+                <svg width="260" height="220" viewBox="0 0 400 260" class="border border-slate-200 rounded-lg bg-slate-50">
+                    <!-- окръжност -->
+                    <circle cx="215" cy="130" r="80" fill="none" stroke="#334155" stroke-width="2"/>
+
+                    <!-- права AB (продължена до M) -->
+                    <line x1="154" y1="181" x2="350" y2="225" stroke="#94a3b8" stroke-width="1.3" />
+                    <!-- права CD (продължена до M) -->
+                    <line x1="350" y1="225" x2="236" y2="53" stroke="#94a3b8" stroke-width="1.3" />
+
+                    <!-- хорда AC -->
+                    <line x1="154" y1="181" x2="294" y2="141" stroke="#1e293b" stroke-width="1.8" />
+                    <!-- хорда BD -->
+                    <line x1="249" y1="203" x2="236" y2="53" stroke="#1e293b" stroke-width="1.8" />
+
+                    <!-- радиуси OB и OC (за централен ъгъл BOC) -->
+                    <line x1="215" y1="130" x2="249" y2="203" stroke="#ef4444" stroke-width="1.4" stroke-dasharray="3,2" />
+                    <line x1="215" y1="130" x2="294" y2="141" stroke="#ef4444" stroke-width="1.4" stroke-dasharray="3,2" />
+
+                    <!-- център O -->
                     <circle cx="215" cy="130" r="3.5" fill="#ef4444" />
-                    <text x="225" y="135" font-family="sans-serif" font-size="18" font-weight="bold" fill="#ef4444">O</text>
-                    <line x1="215" y1="130" x2="260" y2="207.9" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3" />
-                    <line x1="215" y1="130" x2="260" y2="52.1" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3" />
-                    <line x1="15" y1="130" x2="280" y2="214.3" stroke="#94a3b8" stroke-width="1.5" />
-                    <line x1="15" y1="130" x2="280" y2="45.7" stroke="#94a3b8" stroke-width="1.5" />
-                    <line x1="133.2" y1="167.6" x2="260" y2="52.1" stroke="#1e293b" stroke-width="2" />
-                    <line x1="260" y1="207.9" x2="133.2" y2="92.4" stroke="#1e293b" stroke-width="2" />
-                    <circle cx="174.4" cy="130" r="4.5" fill="#1e293b" />
-                    <text x="169" y="152" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b">Q</text>
-                    <circle cx="15" cy="130" r="4" fill="#1e293b" />
-                    <text x="15" y="120" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b">M</text>
-                    <circle cx="133.2" cy="167.6" r="4" fill="#1e293b" />
-                    <text x="123" y="187" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b">A</text>
-                    <circle cx="260" cy="207.9" r="4" fill="#1e293b" />
-                    <text x="270" y="220" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b">B</text>
-                    <circle cx="260" cy="52.1" r="4" fill="#1e293b" />
-                    <text x="270" y="45" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b">C</text>
-                    <circle cx="133.2" cy="92.4" r="4" fill="#1e293b" />
-                    <text x="123" y="85" font-family="sans-serif" font-size="18" font-weight="bold" fill="#1e293b">D</text>
+                    <text x="195" y="125" font-family="sans-serif" font-size="15" font-weight="bold" fill="#ef4444">O</text>
+
+                    <!-- точка Q -->
+                    <circle cx="245" cy="155" r="4" fill="#1e293b" />
+                    <text x="248" y="170" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">Q</text>
+
+                    <!-- точка M -->
+                    <circle cx="350" cy="225" r="4" fill="#1e293b" />
+                    <text x="357" y="232" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">M</text>
+
+                    <!-- точките по окръжността -->
+                    <circle cx="154" cy="181" r="3.5" fill="#1e293b" />
+                    <text x="135" y="190" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">A</text>
+
+                    <circle cx="249" cy="203" r="3.5" fill="#1e293b" />
+                    <text x="245" y="222" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">B</text>
+
+                    <circle cx="294" cy="141" r="3.5" fill="#1e293b" />
+                    <text x="302" y="146" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">C</text>
+
+                    <circle cx="236" cy="53" r="3.5" fill="#1e293b" />
+                    <text x="240" y="45" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">D</text>
                 </svg>`;
 
             currentVariants.forEach((v, index) => {
@@ -579,7 +630,7 @@
                                 <div class="flex flex-col gap-3 pl-4">
                                     <div class="whitespace-nowrap">а) (3 т.) <span class="math-expr">\\(${v.t1a.a}(x-${v.t1a.b})(x+${v.t1a.b}) = ${v.t1a.c}(x-${v.t1a.b})\\)</span></div>
                                     <div class="whitespace-nowrap">б) (3 т.) <span class="math-expr">\\(x^4 - ${v.t1b.Sb}x^2 + ${v.t1b.Pb} = 0\\)</span></div>
-                                    <div class="whitespace-nowrap">в) (4 т.) <span class="math-expr">\\((x^2 ${formatSign(v.t1c.d)}x)^2 ${formatSign(v.t1c.e)}(x^2 ${formatSign(v.t1c.d)}x) ${formatSign(v.t1c.f)} = 0\\)</span></div>
+                                    <div class="whitespace-nowrap">в) (4 т.) <span class="math-expr">\\((x^2 ${formatSign(v.t1c.d)}x)^2 ${formatSign(v.t1c.e)}(x^2 ${formatSign(v.t1c.d)}x) ${formatSignOrEmpty(v.t1c.f)} = 0\\)</span></div>
                                 </div>
                             </div>
 
@@ -702,7 +753,7 @@
                                 <div class="flex flex-col gap-3 pl-4">
                                     <div class="whitespace-nowrap">а) (3 т.) <span class="math-expr">\\((x + ${v.t1a.a})^2 - ${v.t1a.b}(x - ${v.t1a.c})(x + ${v.t1a.c}) = ${v.t1a.d}\\)</span></div>
                                     <div class="whitespace-nowrap">б) (3 т.) <span class="math-expr">\\(x^4 - ${v.t1b.Sb}x^2 + ${v.t1b.Pb} = 0\\)</span></div>
-                                    <div class="whitespace-nowrap">в) (4 т.) <span class="math-expr">\\((x^2 ${formatSign(v.t1c.d_c)}x)^2 ${formatSign(v.t1c.e)}(x^2 ${formatSign(v.t1c.d_c)}x) ${formatSign(v.t1c.f)} = 0\\)</span></div>
+                                    <div class="whitespace-nowrap">в) (4 т.) <span class="math-expr">\\((x^2 ${formatSign(v.t1c.d_c)}x)^2 ${formatSign(v.t1c.e)}(x^2 ${formatSign(v.t1c.d_c)}x) ${formatSignOrEmpty(v.t1c.f)} = 0\\)</span></div>
                                 </div>
                             </div>
 
