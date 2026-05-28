@@ -248,10 +248,12 @@
 
             // Task 6: Intersecting Secants and Chords
             // Modified: We give BMC and BDC, ask for ABD and AQD
-            let bmc_deg = getRandomInt(30, 45); // e.g. 35
-            let abd_deg = getRandomInt(20, 30); // e.g. 25
-            let bdc_deg = bmc_deg + abd_deg;    // e.g. 60
-            let aqd_deg = abd_deg + bdc_deg;    // e.g. 85
+            // Стесняване на диапазона: ∠BDC = ∠BMC + ∠ABD ∈ [60°, 72°]
+            // → дъга BC ∈ [120°, 144°] (отговаря на чертежа с дъга BC ≈ 140°)
+            let bmc_deg = getRandomInt(35, 42); // средно ~38
+            let abd_deg = getRandomInt(25, 30); // средно ~28
+            let bdc_deg = bmc_deg + abd_deg;    // ∈ [60, 72]
+            let aqd_deg = abd_deg + bdc_deg;    // ∠AQD
 
             // Task 7: M, A, B on circle. MA:MB = r_ratio : s_ratio. AMB = amb_deg.
             let combos = [
@@ -362,9 +364,11 @@
             let dist = mq_len / 2;
 
             // Task 6: BOC = central, BQC = chord intersection. Find BAC and AMD
-            let boc_deg = getRandomInt(50, 70);
-            let bqc_deg = getRandomInt(100, 120);
-            let bac_deg = boc_deg / 2;
+            // Стесняване на диапазона: дъга BC = ∠BOC ∈ {54°, 56°, ..., 64°} (винаги четно)
+            // → дъга AD ∈ [136°, 162°] (отговаря на чертежа ≈ 145°)
+            let boc_deg = 2 * getRandomInt(27, 32); // 54, 56, 58, 60, 62, 64
+            let bqc_deg = getRandomInt(100, 113);
+            let bac_deg = boc_deg / 2;              // винаги цяло
             let amd_deg = bqc_deg - boc_deg;
 
             // Task 7: AB:BC:CA = a:b:c
@@ -502,12 +506,12 @@
                 </svg>`;
 
             // Геометрично коректна диаграма за тип A:
-            // Условия: ∠BMC ∈ [30,45], ∠BDC = ∠BMC + ∠ABD ∈ [50,75]
-            // → дъга BC = 2·∠BDC ∈ [100°, 150°] (ГОЛЯМА)
-            // → дъга AD = 2·∠ABD ∈ [40°, 60°] (малка)
-            // Подреждане: AB=90°, BC=130°, CD=80°, DA=60°
-            // A(154,181) B(266,191) C(229,51) D(140,103)
-            // Q(182,132) — вътре; M(23,170) — извън, отляво
+            // Условия: ∠BMC ∈ [35,42], ∠BDC = ∠BMC + ∠ABD ∈ [60,72]
+            // → дъга BC ∈ [120°, 144°] (ГОЛЯМА)
+            // → дъга AD ∈ [50°, 60°] (малка)
+            // Чертежът показва: AB=80°, BC=140°, CD=90°, DA=50°
+            // A(154,181) B(255,199) C(229,51) D(136,116)
+            // Q(176,144) — вътре; M(65,166) — извън, отляво
             const svgTask6TypeA = `
                 <svg width="260" height="220" viewBox="0 0 320 260" class="border border-slate-200 rounded-lg bg-slate-50">
                     <!-- окръжност -->
@@ -517,35 +521,35 @@
                     <text x="222" y="125" font-family="sans-serif" font-size="15" font-weight="bold" fill="#64748b">O</text>
 
                     <!-- права AB (продължена до M отляво) -->
-                    <line x1="23" y1="170" x2="266" y2="191" stroke="#94a3b8" stroke-width="1.3" />
+                    <line x1="65" y1="166" x2="255" y2="199" stroke="#94a3b8" stroke-width="1.3" />
                     <!-- права CD (продължена до M отляво) -->
-                    <line x1="23" y1="170" x2="229" y2="51" stroke="#94a3b8" stroke-width="1.3" />
+                    <line x1="65" y1="166" x2="229" y2="51" stroke="#94a3b8" stroke-width="1.3" />
 
                     <!-- хорда AC -->
                     <line x1="154" y1="181" x2="229" y2="51" stroke="#1e293b" stroke-width="1.8" />
                     <!-- хорда BD -->
-                    <line x1="266" y1="191" x2="140" y2="103" stroke="#1e293b" stroke-width="1.8" />
+                    <line x1="255" y1="199" x2="136" y2="116" stroke="#1e293b" stroke-width="1.8" />
 
                     <!-- точка M (извън, отляво) -->
-                    <circle cx="23" cy="170" r="4" fill="#1e293b" />
-                    <text x="5" y="167" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">M</text>
+                    <circle cx="65" cy="166" r="4" fill="#1e293b" />
+                    <text x="48" y="163" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">M</text>
 
                     <!-- точка Q (вътре) -->
-                    <circle cx="182" cy="132" r="4" fill="#ef4444" />
-                    <text x="186" y="146" font-family="sans-serif" font-size="15" font-weight="bold" fill="#ef4444">Q</text>
+                    <circle cx="176" cy="144" r="4" fill="#ef4444" />
+                    <text x="180" y="158" font-family="sans-serif" font-size="15" font-weight="bold" fill="#ef4444">Q</text>
 
                     <!-- точките по окръжността -->
                     <circle cx="154" cy="181" r="3.5" fill="#1e293b" />
                     <text x="135" y="190" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">A</text>
 
-                    <circle cx="266" cy="191" r="3.5" fill="#1e293b" />
-                    <text x="272" y="200" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">B</text>
+                    <circle cx="255" cy="199" r="3.5" fill="#1e293b" />
+                    <text x="261" y="208" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">B</text>
 
                     <circle cx="229" cy="51" r="3.5" fill="#1e293b" />
                     <text x="234" y="45" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">C</text>
 
-                    <circle cx="140" cy="103" r="3.5" fill="#1e293b" />
-                    <text x="120" y="100" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">D</text>
+                    <circle cx="136" cy="116" r="3.5" fill="#1e293b" />
+                    <text x="118" y="113" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">D</text>
                 </svg>`;
 
             // Геометрично коректна диаграма за тип B
