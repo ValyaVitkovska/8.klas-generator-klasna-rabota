@@ -502,48 +502,50 @@
                 </svg>`;
 
             // Геометрично коректна диаграма за тип A:
-            // Подредба около окръжността (обратно на часовниковата): A, B, C, D
-            // Дъги: AB=75°, BC=57°, CD=83°, DA=145° (DA е най-голяма ← важно за условията)
-            // Координати: A(154,181) B(249,203) C(294,141) D(236,53)
-            // Q(245,155) вътре, M(350,225) извън (продължение на правите AB и CD)
+            // Условия: ∠BMC ∈ [30,45], ∠BDC = ∠BMC + ∠ABD ∈ [50,75]
+            // → дъга BC = 2·∠BDC ∈ [100°, 150°] (ГОЛЯМА)
+            // → дъга AD = 2·∠ABD ∈ [40°, 60°] (малка)
+            // Подреждане: AB=90°, BC=130°, CD=80°, DA=60°
+            // A(154,181) B(266,191) C(229,51) D(140,103)
+            // Q(182,132) — вътре; M(23,170) — извън, отляво
             const svgTask6TypeA = `
-                <svg width="260" height="220" viewBox="0 0 400 260" class="border border-slate-200 rounded-lg bg-slate-50">
+                <svg width="260" height="220" viewBox="0 0 320 260" class="border border-slate-200 rounded-lg bg-slate-50">
                     <!-- окръжност -->
                     <circle cx="215" cy="130" r="80" fill="none" stroke="#334155" stroke-width="2"/>
                     <!-- център O -->
                     <circle cx="215" cy="130" r="3" fill="#64748b" />
-                    <text x="200" y="125" font-family="sans-serif" font-size="15" font-weight="bold" fill="#64748b">O</text>
+                    <text x="222" y="125" font-family="sans-serif" font-size="15" font-weight="bold" fill="#64748b">O</text>
 
-                    <!-- права AB (продължена до M) -->
-                    <line x1="154" y1="181" x2="350" y2="225" stroke="#94a3b8" stroke-width="1.3" />
-                    <!-- права CD (продължена до M) -->
-                    <line x1="350" y1="225" x2="236" y2="53" stroke="#94a3b8" stroke-width="1.3" />
+                    <!-- права AB (продължена до M отляво) -->
+                    <line x1="23" y1="170" x2="266" y2="191" stroke="#94a3b8" stroke-width="1.3" />
+                    <!-- права CD (продължена до M отляво) -->
+                    <line x1="23" y1="170" x2="229" y2="51" stroke="#94a3b8" stroke-width="1.3" />
 
                     <!-- хорда AC -->
-                    <line x1="154" y1="181" x2="294" y2="141" stroke="#1e293b" stroke-width="1.8" />
+                    <line x1="154" y1="181" x2="229" y2="51" stroke="#1e293b" stroke-width="1.8" />
                     <!-- хорда BD -->
-                    <line x1="249" y1="203" x2="236" y2="53" stroke="#1e293b" stroke-width="1.8" />
+                    <line x1="266" y1="191" x2="140" y2="103" stroke="#1e293b" stroke-width="1.8" />
 
-                    <!-- точка Q (вътре в окръжността) -->
-                    <circle cx="245" cy="155" r="4" fill="#ef4444" />
-                    <text x="248" y="170" font-family="sans-serif" font-size="15" font-weight="bold" fill="#ef4444">Q</text>
+                    <!-- точка M (извън, отляво) -->
+                    <circle cx="23" cy="170" r="4" fill="#1e293b" />
+                    <text x="5" y="167" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">M</text>
 
-                    <!-- точка M (извън окръжността, продължение) -->
-                    <circle cx="350" cy="225" r="4" fill="#1e293b" />
-                    <text x="357" y="232" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">M</text>
+                    <!-- точка Q (вътре) -->
+                    <circle cx="182" cy="132" r="4" fill="#ef4444" />
+                    <text x="186" y="146" font-family="sans-serif" font-size="15" font-weight="bold" fill="#ef4444">Q</text>
 
                     <!-- точките по окръжността -->
                     <circle cx="154" cy="181" r="3.5" fill="#1e293b" />
                     <text x="135" y="190" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">A</text>
 
-                    <circle cx="249" cy="203" r="3.5" fill="#1e293b" />
-                    <text x="245" y="222" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">B</text>
+                    <circle cx="266" cy="191" r="3.5" fill="#1e293b" />
+                    <text x="272" y="200" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">B</text>
 
-                    <circle cx="294" cy="141" r="3.5" fill="#1e293b" />
-                    <text x="302" y="146" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">C</text>
+                    <circle cx="229" cy="51" r="3.5" fill="#1e293b" />
+                    <text x="234" y="45" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">C</text>
 
-                    <circle cx="236" cy="53" r="3.5" fill="#1e293b" />
-                    <text x="240" y="45" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">D</text>
+                    <circle cx="140" cy="103" r="3.5" fill="#1e293b" />
+                    <text x="120" y="100" font-family="sans-serif" font-size="15" font-weight="bold" fill="#1e293b">D</text>
                 </svg>`;
 
             // Геометрично коректна диаграма за тип B
